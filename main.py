@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request, status
 from fastapi.responses import RedirectResponse, JSONResponse
 from contextlib import asynccontextmanager
+from producers.plugins.kafka_producer import KafkaProducer
 from shared.exceptions import APIException
 import httpx
 import logging
@@ -10,9 +11,17 @@ from config import settings
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    async with httpx.AsyncClient() as client:
-        app.state.http_client = client
-        yield
+    http_client = httpx.AsyncClient()
+    app.state.http_client = http_client
+
+    kafka_producer = KafkaProducer()
+    app.state.kafka_producer = kafka_producer
+
+    yield 
+
+    app.state.kafka_producer.flush(timeout=5)
+
+    await app.state.http_client.aclose()
 
 description = """
 #### Key Features:
