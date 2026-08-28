@@ -1,3 +1,5 @@
+import asyncio
+
 from fastapi import FastAPI, Request, status
 from fastapi.responses import RedirectResponse, JSONResponse
 from contextlib import asynccontextmanager
@@ -8,6 +10,7 @@ import logging
 import sys
 import producers.routes as producer_routes
 from config import settings
+from consumers.notif_consumer import consume_notification, stop_event
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -17,10 +20,28 @@ async def lifespan(app: FastAPI):
     kafka_producer = KafkaProducer()
     app.state.kafka_producer = kafka_producer
 
+    stop_event.clear()
+
+    email_worker = asyncio.create_task(
+        asyncio.to_thread(
+            consume_notification, 
+            group_id="email-notification-group", 
+            topic=settings.kafka_topics['email']
+        )
+    )
+    
+    push_worker = asyncio.create_task(
+        asyncio.to_thread(
+            consume_notification, 
+            group_id="push-notification-group", 
+            topic=settings.kafka_topics['push']
+        )
+    )
+
     yield 
-
+    stop_event.set()
     app.state.kafka_producer.flush(timeout=5)
-
+    await asyncio.gather(email_worker, push_worker)
     await app.state.http_client.aclose()
 
 description = """

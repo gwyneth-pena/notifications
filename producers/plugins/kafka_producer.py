@@ -57,3 +57,7 @@ class KafkaProducer:
                 location="kafka",
                 type_="server_error",
             )
+
+    def flush(self, timeout=5):
+        """Flush the producer"""
+        self.__producer.flush(timeout=timeout)
