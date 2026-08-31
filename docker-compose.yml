@@ -1,5 +1,4 @@
 services:
-  # 1. FastAPI Producer API
   api:
     build: .
     container_name: notification_api
@@ -21,21 +20,3 @@ services:
             - .venv/
             - .git/
 
-  # 2. Redpanda Consumer Worker
-  # worker:
-  #   build: .
-  #   container_name: notification_worker
-  #   env_file:
-  #     - .env
-  #   command: uv run python worker.py
-  #   restart: always
-  #   develop:
-  #     watch:
-  #       - action: rebuild
-  #         path: pyproject.toml
-  #       - action: sync
-  #         path: .
-  #         target: /app
-  #         ignore:
-  #           - .venv/
-  #           - .git/

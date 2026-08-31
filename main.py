@@ -1,7 +1,8 @@
 import asyncio
-
+from consumers.plugins.db import Base, engine
 from fastapi import FastAPI, Request, status
-from fastapi.responses import RedirectResponse, JSONResponse
+from fastapi.responses import RedirectResponse, JSONResponse    
+from sqlalchemy import text
 from contextlib import asynccontextmanager
 from producers.plugins.kafka_producer import KafkaProducer
 from shared.exceptions import APIException
@@ -12,8 +13,16 @@ import producers.routes as producer_routes
 from config import settings
 from consumers.notif_consumer import consume_notification, stop_event
 
+def init_db():
+    with engine.connect() as conn:
+        conn.execute(text("SELECT 1"))
+        Base.metadata.create_all(bind=engine)
+        print("Connected to database")
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    await asyncio.to_thread(init_db)
+
     http_client = httpx.AsyncClient()
     app.state.http_client = http_client
 

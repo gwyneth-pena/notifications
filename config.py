@@ -18,6 +18,18 @@ class AppSettings(BaseSettings):
     kafka_buffer_linger_ms: int = 5
     kafka_buffer_max_kbytes: int = 64000
 
+    email_user: str = "user@example.com"
+    email_pass: str = "password"
+    email_server: str = "smtp.example.com"
+    email_port: int = 587
+    email_from: str = "notifications@example.com"
+
+    db_user: str = "user"
+    db_pass: str = "password"
+    db_host: str = "localhost"
+    db_port: int = 5432
+    db_name: str = "notifications"
+
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
 settings = AppSettings()

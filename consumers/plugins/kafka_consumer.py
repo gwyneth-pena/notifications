@@ -34,3 +34,6 @@ class KafkaConsumer:
                     yield msg.value()
         finally:
             self.__consumer.close()
+
+    def commit(self):
+        self.__consumer.commit()
