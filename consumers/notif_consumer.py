@@ -33,7 +33,7 @@ def consume_notification(group_id, topic):
             recipient = data.get("recipient")
             payload = data.get("payload", {})
 
-            template = repo.get_template(application_id, template_code)
+            template = repo.get_template(application_id, template_code.upper())
             if not template:
                 print(f"Template not found for code: {template_code}")
                 continue
