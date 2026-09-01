@@ -1,3 +1,4 @@
+import json
 from config import settings
 from confluent_kafka import Producer
 from fastapi import status
@@ -21,7 +22,7 @@ class KafkaProducer:
 
         self.__topics = settings.kafka_topics
 
-    def send(self, payload: NotificationSchema):
+    def send(self, application_id: str , payload: NotificationSchema):
         """Sends a notification to Kafka"""
         delivery_error = None
 
@@ -31,11 +32,31 @@ class KafkaProducer:
                 delivery_error = err
 
         try:
-            value_bytes = payload.model_dump_json(
-                exclude_unset=True, exclude_none=True
-            ).encode("utf-8")
+            topic = self.__topics.get(payload.type)
+            if not topic:
+                raise APIException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    msg=f"Invalid notification type: {payload.type}",
+                    location="kafka",
+                    type_="invalid_request",
+                )
 
-            key_bytes = payload.tenant_id.encode("utf-8")
+            raw_payload = (
+                payload.payload.model_dump()
+                if hasattr(payload.payload, "model_dump")
+                else payload.payload
+            )
+
+            value = {
+                "application_id": str(application_id),
+                "template_code": payload.template_code,
+                "type": payload.type,
+                "recipient": payload.recipient,
+                "payload": raw_payload,
+            }
+            
+            value_bytes = json.dumps(value, default=str).encode("utf-8")
+            key_bytes = str(application_id).encode("utf-8")
 
             self.__producer.produce(
                 topic=self.__topics[payload.type],

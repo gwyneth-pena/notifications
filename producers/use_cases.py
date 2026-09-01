@@ -4,13 +4,11 @@ from producers.schemas import NotificationSchema
 
 
 class NotificationUseCase:
-    def __init__(self, repo, producer):
-        self.__repo = repo
+    def __init__(self, producer):
         self.__producer = producer
 
     
-    def send_notification(self, tenant_id, recipient, message, type):
+    def send_notification(self, application_id, template_code, recipient, payload, type):
         """ Sends a notification to Kafka """
 
-        #TODO: validate tenant_id, recipient, message, type
-        self.__producer.send(payload=NotificationSchema(tenant_id=tenant_id, recipient=recipient, message=message, type=type))
+        self.__producer.send(application_id=application_id, payload=NotificationSchema(template_code=template_code, recipient=recipient, payload=payload, type=type))

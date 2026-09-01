@@ -1,13 +1,16 @@
 
-class Application:
-    def __init__(self, name, api_key, is_active):
+class ApplicationModel:
+    def __init__(self, id, name, api_key, is_active):
+        self.id = id
         self.name = name
         self.api_key = api_key
         self.is_active = is_active
 
 
-class NotificationTemplate:
-    def __init__(self, code, subject, template_path, sender_name, sender_email, reply_to, is_active):
+class NotificationTemplateModel:
+    def __init__(self,id, application_id, code, subject, template_path, sender_name, sender_email, reply_to, is_active):
+        self.id = id
+        self.application_id = application_id
         self.code = code
         self.subject = subject
         self.template_path = template_path
@@ -17,7 +20,7 @@ class NotificationTemplate:
         self.is_active = is_active
 
 
-class Notification:
+class NotificationModel:
     def __init__(self, recipient, channel, payload, status, retry_count, max_retries, error_message):
         self.recipient = recipient
         self.channel = channel

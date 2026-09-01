@@ -1,10 +1,10 @@
-from typing import Literal
 from shared.trimmed_base_model import TrimmedBaseModel
+from typing import Literal
 
 
 class NotificationSchema(TrimmedBaseModel):
     """ Notification Schema """
-    tenant_id: str
+    template_code: str
     recipient: str
-    message: str
+    payload: dict
     type: Literal['email', 'push'] = "email"

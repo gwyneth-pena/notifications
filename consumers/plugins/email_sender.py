@@ -2,6 +2,7 @@ import asyncio
 from pathlib import Path
 from fastapi_mail import ConnectionConfig, FastMail, MessageSchema, MessageType
 from config import settings
+from typing import Optional, List, Dict, Any
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 TEMPLATE_DIR = BASE_DIR / "templates" / "email"
@@ -25,14 +26,52 @@ class EmailSender:
     def __init__(self):
         self.__fastmail = FastMail(email_conf)
 
-    async def send_async(self, email: str, subject: str, template_file_name: str, template_data: dict):
+    async def send_async(
+        self, 
+        email: str, 
+        subject: str, 
+        template_file_name: str, 
+        template_data: Dict[str, Any],
+        reply_to: Optional[List[str]] = None,
+        cc: Optional[List[str]] = None,
+        bcc: Optional[List[str]] = None
+    ) -> None:
         message = MessageSchema(
             subject=subject,
             recipients=[email],
             template_body=template_data,
-            subtype=MessageType.html
+            subtype=MessageType.html,
+            reply_to=reply_to or [],
+            cc=cc or [],
+            bcc=bcc or []
         )
+        
         await self.__fastmail.send_message(message, template_name=template_file_name)
 
-    def send(self, email: str, subject: str, template_file_name: str, template_data: dict):
-        asyncio.run(self.send_async(email, subject, template_file_name, template_data))
+    def send(
+        self, 
+        email: str, 
+        subject: str, 
+        template_file_name: str, 
+        template_data: Dict[str, Any],
+        reply_to: Optional[List[str]] = None,
+        cc: Optional[List[str]] = None,
+        bcc: Optional[List[str]] = None
+    ) -> None:
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            loop = None
+
+        if loop and loop.is_running():
+            loop.create_task(
+                self.send_async(
+                    email, subject, template_file_name, template_data, reply_to, cc, bcc
+                )
+            )
+        else:
+            asyncio.run(
+                self.send_async(
+                    email, subject, template_file_name, template_data, reply_to, cc, bcc
+                )
+            )

@@ -25,6 +25,11 @@ def auth_required(func):
 
             if not is_valid:
                 raise APIException(status_code=401, msg="Not authenticated")
+
+            auth_info = AuthRepo(db_session).auth_info(api_key)
+
+            request.state.auth_info = auth_info
+            
         finally:
             if db_session:
                 db_session.close()
