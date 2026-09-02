@@ -38,6 +38,12 @@ def consume_notification(group_id, topic):
                 print(f"Template not found for code: {template_code}")
                 continue
 
+            notif = repo.save_notification(application_id, template.id, recipient, msg_type, payload, 3)
+
+            if not notif:
+                print(f"Notification not saved for recipient: {recipient}")
+                continue
+
             if msg_type == "email":
                 email_sender.send(
                     email=recipient,
@@ -49,6 +55,8 @@ def consume_notification(group_id, topic):
 
             consumer.commit()
             print(f"Successfully processed message for recipient: {recipient}")
+
+            repo.update_notification_status(notif.id, "SENT")
 
         except Exception as e:
             print(f"Error processing message: {e}")

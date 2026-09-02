@@ -21,7 +21,10 @@ class NotificationTemplateModel:
 
 
 class NotificationModel:
-    def __init__(self, recipient, channel, payload, status, retry_count, max_retries, error_message):
+    def __init__(self,id, application_id, template_id, recipient, channel, payload, status, retry_count, max_retries, error_message):
+        self.id = id
+        self.application_id = application_id
+        self.template_id = template_id
         self.recipient = recipient
         self.channel = channel
         self.payload = payload
