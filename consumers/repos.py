@@ -85,7 +85,12 @@ class NotificationRepo:
             return self.__to_notification_model(notification)
         except IntegrityError:
             self.__db_session.rollback()
-            return None
+            notification = (
+                self.__db_session.query(Notification)
+                .filter(Notification.idempotency_key == idempotency_key)
+                .first()
+            )
+            return self.__to_notification_model(notification) if notification else None
         except SQLAlchemyError:
             self.__db_session.rollback()
             return None
