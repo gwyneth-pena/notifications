@@ -12,7 +12,8 @@ class AppSettings(BaseSettings):
     kafka_sasl_password: str = "password"
     kafka_topics: dict = {
         'email': 'notifications.email',
-        'push': 'notifications.push'
+        'push': 'notifications.push',
+        'dlq': 'notifications.dlq',
     }
     kafka_buffer_max_messages: int = 100000
     kafka_buffer_linger_ms: int = 5
