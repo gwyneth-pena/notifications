@@ -56,7 +56,8 @@ def consume_notification(group_id, topic):
                 notif = repo.save_notification(application_id, template.id, recipient, msg_type, payload, 3)
 
                 if not notif:
-                    raise Exception("Notification not saved")
+                    consumer.commit()
+                    continue
 
                 if notif.status == "SENT":
                     consumer.commit()
