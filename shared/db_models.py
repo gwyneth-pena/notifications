@@ -1,4 +1,4 @@
-from consumers.plugins.db import Base
+from shared.db import Base
 from sqlalchemy import (
     Column, Integer, String, DateTime, Boolean, JSON, 
     ForeignKey, func, UniqueConstraint

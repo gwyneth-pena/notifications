@@ -1,6 +1,6 @@
 import json
 import threading
-from consumers.plugins.db import get_db
+from shared.db import get_db
 from consumers.plugins.email_sender import EmailSender
 from consumers.plugins.kafka_consumer import KafkaConsumer
 from consumers.plugins.kafka_producer import KafkaProducer

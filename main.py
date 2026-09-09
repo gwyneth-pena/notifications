@@ -1,5 +1,5 @@
 import asyncio
-from consumers.plugins.db import Base, engine
+from shared.db import Base, engine
 from fastapi import FastAPI, Request, status
 from fastapi.responses import RedirectResponse, JSONResponse    
 from sqlalchemy import text

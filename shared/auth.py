@@ -1,38 +1,18 @@
-
-from functools import wraps
-from consumers.plugins.db import get_db
-from fastapi import Request
+from fastapi import Depends, Header
+from sqlalchemy.orm import Session
+from shared.db import get_db
 from shared.repos import AuthRepo
 from shared.exceptions import APIException
 
+def get_current_user(
+    x_api_key: str = Header(..., alias="x-api-key"), 
+    db: Session = Depends(get_db)
+):
+    if not x_api_key:
+        raise APIException(status_code=401, msg="Not authenticated")
 
-def auth_required(func):
-    """ Auth Required """
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        db_session = None
-        try:
-            request: Request = kwargs.get("request")
-            
-            api_key = request.headers.get("x-api-key")
+    auth_info = AuthRepo(db).get_auth_info_by_key(x_api_key)
+    if not auth_info:
+        raise APIException(status_code=401, msg="Not authenticated")
 
-            if not api_key:
-                raise APIException(status_code=401, msg="Not authenticated")
-
-            db_gen = get_db()
-            db_session = next(db_gen)
-            is_valid = AuthRepo(db_session).verify_api_key(api_key)
-
-            if not is_valid:
-                raise APIException(status_code=401, msg="Not authenticated")
-
-            auth_info = AuthRepo(db_session).auth_info(api_key)
-
-            request.state.auth_info = auth_info
-            
-        finally:
-            if db_session:
-                db_session.close()
-    
-        return func(*args, **kwargs)
-    return wrapper
+    return auth_info
