@@ -10,6 +10,7 @@ import httpx
 import logging
 import sys
 import producers.routes as producer_routes
+import consumers.routes as consumer_routes
 from config import settings
 from consumers.notif_consumer import consume_notification, stop_event
 
@@ -55,6 +56,9 @@ async def lifespan(app: FastAPI):
 
 description = """
 #### Key Features:
+- Send notifications to Kafka
+- Consume notifications from Kafka
+- Retry failed notifications
 """
 
 app = FastAPI(
@@ -117,4 +121,5 @@ def health_check():
     return {"status": "healthy"}
 
 
+app.include_router(consumer_routes.router)
 app.include_router(producer_routes.router)

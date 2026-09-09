@@ -2,7 +2,7 @@
 from functools import wraps
 from consumers.plugins.db import get_db
 from fastapi import Request
-from producers.repos import AuthRepo
+from shared.repos import AuthRepo
 from shared.exceptions import APIException
 
 

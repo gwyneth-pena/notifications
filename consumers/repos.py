@@ -131,3 +131,21 @@ class NotificationRepo:
         self.__db_session.refresh(notification)
 
         return self.__to_notification_model(notification)
+
+    def get_failed(self, application_id) -> dict:
+        """ Gets failed requests from DB """ 
+        failed_requests = (
+            self.__db_session.query(Notification)
+            .filter(Notification.application_id == application_id)
+            .filter(Notification.status == "FAILED")
+            .all()
+        )
+        total_failed = len(failed_requests)
+
+        return {
+            "count": total_failed,
+            "data": [
+                self.__to_notification_model(failed_request)
+                for failed_request in failed_requests   
+            ],
+        }

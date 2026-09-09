@@ -1,12 +1,8 @@
-from consumers.plugins.db import get_db
 from fastapi import APIRouter, Depends, Request
-from producers.auth import auth_required
+from shared.auth import auth_required
 from producers.schemas import NotificationSchema
 from producers.use_cases import NotificationUseCase
-from producers.repos import NotificationRepo
 from shared.exceptions import APIException
-from sqlalchemy.orm import Session
-
 
 
 def get_notification_use_case(
