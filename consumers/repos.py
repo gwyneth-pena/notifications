@@ -136,8 +136,7 @@ class NotificationRepo:
         """ Gets failed requests from DB """ 
         failed_requests = (
             self.__db_session.query(Notification)
-            .filter(Notification.application_id == application_id)
-            .filter(Notification.status == "FAILED")
+            .filter(Notification.application_id == application_id, Notification.status == "FAILED")
             .all()
         )
         total_failed = len(failed_requests)

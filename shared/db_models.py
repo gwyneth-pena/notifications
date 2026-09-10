@@ -1,7 +1,7 @@
 from shared.db import Base
 from sqlalchemy import (
     Column, Integer, String, DateTime, Boolean, JSON, 
-    ForeignKey, func, UniqueConstraint
+    ForeignKey, func, UniqueConstraint, Index
 )
 from sqlalchemy.orm import relationship
 
@@ -73,3 +73,7 @@ class Notification(Base):
 
     application = relationship("Application", back_populates="notifications")
     template = relationship("NotificationTemplate", back_populates="notifications")
+
+    __table_args__ = (
+        Index("idx_app_status", "application_id", "status"),
+    )
